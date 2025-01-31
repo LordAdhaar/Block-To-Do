@@ -22,8 +22,37 @@ Block-To-Do is a blockchain-based To-Do application integrated with AI features 
    - **Data Integrity**: Tasks are stored on the blockchain, ensuring they remain tamper-proof and transparent.
    - **Decentralization**: Eliminates the need for a central authority, enhancing data security and user control.
 
----
+## How to Interact with the Live Website
 
-*Note: This project is under active development. Contributions and feedback are welcome to improve its functionality and user experience.*
+1. **Install MetaMask**: Download and install the MetaMask Chrome extension to manage your wallet.
+2. **Enable Test Network**: In MetaMask, enable the "Test Network" option to interact with a test network.
+3. **Get Test Sepolia**:
+   - Go to [Sepolia Faucet](https://cloud.google.com/application/web3/faucet/ethereum/sepolia).
+   - Follow the instructions to receive test Sepolia ETH to use on the Sepolia network.
 
----
+Once you're set up, visit the live website and connect your MetaMask wallet to interact with the application.
+
+## How to Run Locally
+
+1. **Clone the Repo**: Clone the project repository to your local machine.
+   ```bash
+   git clone <repository-url>
+   ```
+
+2. **Install Dependencies**: Navigate to the project folder and run the following command to install the dependencies.
+   ```bash
+   npm install
+   ```
+
+3. **Create `.env` File**: Create a `.env` file in the root directory and add your CopilotKit API key as follows:
+   ```bash
+   REACT_APP_COPILOT_API_KEY=YOUR_PRIVATE_KEY
+   ```
+   You can obtain your CopilotKit API key from CopilotKit.
+
+4. **Start the Development Server**: Run the following command to start the app locally.
+   ```bash
+   npm start
+   ```
+
+5. **Ensure MetaMask and Sepolia ETH**: Make sure you have MetaMask installed and have some Sepolia ETH to interact with the smart contract. You can refer to the "How to Interact with the Live Website" section above for instructions on enabling Sepolia on MetaMask and getting test Sepolia ETH.
