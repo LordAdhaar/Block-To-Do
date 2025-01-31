@@ -48,7 +48,7 @@ Once you're set up, visit the live website and connect your MetaMask wallet to i
    ```bash
    REACT_APP_COPILOT_API_KEY=YOUR_PRIVATE_KEY
    ```
-   You can obtain your CopilotKit API key from CopilotKit.
+   You can obtain your CopilotKit API key from https://www.copilotkit.ai/
 
 4. **Start the Development Server**: Run the following command to start the app locally.
    ```bash
