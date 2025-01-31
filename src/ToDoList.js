@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import Web3 from 'web3';
 import './ToDoList.css';
+import { CopilotKit } from "@copilotkit/react-core";
+import { CopilotSidebar } from "@copilotkit/react-ui";
+import "@copilotkit/react-ui/styles.css";
 
 const ToDoList = () => {
   const [web3, setWeb3] = useState(null);
@@ -12,6 +15,7 @@ const ToDoList = () => {
     priority: '0',
     dueDate: ''
   });
+  const [editingTask, setEditingTask] = useState(null);
 
   // Contract ABI would go here
   const contractABI = [
@@ -285,6 +289,7 @@ const ToDoList = () => {
   ];
   const contractAddress = "0x34539AEFc01E3e35883be3B73fBCe229520A9bf7";
 
+
   useEffect(() => {
     const initWeb3 = async () => {
       if (window.ethereum) {
@@ -298,7 +303,6 @@ const ToDoList = () => {
           setContract(contractInstance);
           setAccount(accounts[0]);
 
-          // Load tasks
           loadTasks(contractInstance, accounts[0]);
         } catch (error) {
           console.error('Error initializing Web3:', error);
@@ -346,6 +350,36 @@ const ToDoList = () => {
     }
   };
 
+  const handleEditTask = async () => {
+    try {
+      const timestamp = Math.floor(new Date(editingTask.dueDate).getTime() / 1000);
+      await contract.methods
+        .editTask(
+          editingTask.id.toString(),
+          editingTask.description,
+          Number(editingTask.priority),
+          timestamp
+        )
+        .send({ from: account });
+
+      loadTasks(contract, account);
+      setEditingTask(null);
+    } catch (error) {
+      console.error('Error editing task:', error);
+    }
+  };
+
+  const startEditing = (task) => {
+    setEditingTask({
+      ...task,
+      dueDate: new Date(task.dueDate * 1000).toISOString().split('T')[0]
+    });
+  };
+
+  const cancelEditing = () => {
+    setEditingTask(null);
+  };
+
   const handleCompleteTask = async (taskId) => {
     try {
       await contract.methods.markTaskComplete(taskId.toString()).send({ from: account });
@@ -379,8 +413,9 @@ const ToDoList = () => {
 
   return (
     <div className="todo-container">
+
       <div className="todo-card">
-        <h1 className="todo-title">Blockchain ToDo List</h1>
+        <h1 className="todo-title">BlockToDo</h1>
 
         <div className="add-task-form">
           <input
@@ -413,37 +448,90 @@ const ToDoList = () => {
         <div className="tasks-list">
           {tasks.map((task) => (
             <div key={task.id} className="task-item">
-              <div className="task-content">
-                <span className={`task-description ${task.completed ? 'completed' : ''}`}>
-                  {task.description}
-                </span>
-                <span className={`priority-badge ${getPriorityClass(task.priority)}`}>
-                  {['Low', 'Medium', 'High'][task.priority]}
-                </span>
-                <span className="due-date">
-                  Due: {formatDate(task.dueDate)}
-                </span>
-              </div>
-              <div className="task-actions">
-                {!task.completed && (
-                  <button
-                    onClick={() => handleCompleteTask(task.id)}
-                    className="complete-button"
+              {editingTask?.id === task.id ? (
+                <div className="edit-task-form">
+                  <input
+                    type="text"
+                    value={editingTask.description}
+                    onChange={(e) => setEditingTask({ ...editingTask, description: e.target.value })}
+                    className="task-input"
+                  />
+                  <select
+                    value={editingTask.priority}
+                    onChange={(e) => setEditingTask({ ...editingTask, priority: e.target.value })}
+                    className="priority-select"
                   >
-                    Complete
-                  </button>
-                )}
-                <button
-                  onClick={() => handleDeleteTask(task.id)}
-                  className="delete-button"
-                >
-                  Delete
-                </button>
-              </div>
+                    <option value="0">Low</option>
+                    <option value="1">Medium</option>
+                    <option value="2">High</option>
+                  </select>
+                  <input
+                    type="date"
+                    value={editingTask.dueDate}
+                    onChange={(e) => setEditingTask({ ...editingTask, dueDate: e.target.value })}
+                    className="date-input"
+                  />
+                  <div className="edit-actions">
+                    <button onClick={handleEditTask} className="save-button">
+                      Save
+                    </button>
+                    <button onClick={cancelEditing} className="cancel-button">
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className="task-content">
+                    <span className={`task-description ${task.completed ? 'completed' : ''}`}>
+                      {task.description}
+                    </span>
+                    <span className={`priority-badge ${getPriorityClass(task.priority)}`}>
+                      {['Low', 'Medium', 'High'][task.priority]}
+                    </span>
+                    <span className="due-date">
+                      Due: {formatDate(task.dueDate)}
+                    </span>
+                  </div>
+                  <div className="task-actions">
+                    {!task.completed && (
+                      <>
+                        <button
+                          onClick={() => startEditing(task)}
+                          className="edit-button"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleCompleteTask(task.id)}
+                          className="complete-button"
+                        >
+                          Complete
+                        </button>
+                      </>
+                    )}
+                    <button
+                      onClick={() => handleDeleteTask(task.id)}
+                      className="delete-button"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           ))}
         </div>
       </div>
+      <CopilotKit publicApiKey="ck_pub_5685511be3c01ca8f208ed01bd977a9f">
+        <CopilotSidebar
+          labels={{
+            title: "Sidebar Assistant",
+            initial: "How can I help you today?"
+          }}
+          instructions="You are assisting the user as best as you can. Answer in the best possible way"
+        />
+      </CopilotKit>
     </div>
   );
 };
