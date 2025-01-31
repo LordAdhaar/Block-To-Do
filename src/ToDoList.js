@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Web3 from 'web3';
-import contractABI from './abi/ToDoListABI';
+import contractABI from './contract/ToDoListABI';
 import { useCopilotReadable } from "@copilotkit/react-core";
 
 import './ToDoList.css';
